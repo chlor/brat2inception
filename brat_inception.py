@@ -1,23 +1,12 @@
 import pandas as pd
 from cassis import *
-from cassis.typesystem import TYPE_NAME_FS_ARRAY, TYPE_NAME_ANNOTATION
 
 
-#typesystem = TypeSystem()
-#neg_fact = typesystem.create_type(name='example.Negation_Faktuality')
-#typesystem.create_feature(domainType=neg_fact, name='example', rangeType=TYPE_NAME_ANNOTATION)
-
-
-#with open('FactCharact_entities_layer.xml', 'rb') as f:
-with open('TypeSystem_semant_Ann.xml', 'rb') as f:
+with open('FactCharact_entities_layer.xml', 'rb') as f:
+#with open('TypeSystem_semant_Ann.xml', 'rb') as f:
     typesystem = load_typesystem(f)
 
 print(typesystem.get_types())
-
-#for t in typesystem.get_types():
-#    print(t)
-
-
 
 
 anno_file = '/home/chlor/PycharmProjects/brat2inception/test_data/Albers.ann'
@@ -44,13 +33,13 @@ for index, line in ann.iterrows():
         begin = spl[1]
         end = spl[2]
 
-        Token = typesystem.get_type('gemtex.Concept')
+        #Token = typesystem.get_type('gemtex.Concept')
+        Token = typesystem.get_type('webanno.custom.FactCharact')
         cas.add(
             Token(
                 begin=int(begin),
                 end=int(end),
-                id=spl[0],
-                literal=str(spl[0])
+                entities=entity_type
             )
         )
 
