@@ -19,6 +19,8 @@ def process_brat_file_pair(typesystem, text_file, layer_name, brat_project, outd
     ann = pd.read_csv(anno_file, delimiter='\t', index_col=0, header=None)
     ann.columns = ['entity_type_begin_end', 'text']
 
+    entities = {}
+
     for index, line in ann.iterrows():
 
         spl = line['entity_type_begin_end'].split(' ')
@@ -29,20 +31,23 @@ def process_brat_file_pair(typesystem, text_file, layer_name, brat_project, outd
             begin = spl[1]
             end = spl[2]
 
+            entities[str(index)] = {'entity_type': entity_type, 'begin': begin, 'end': end}
+
             if ';' not in begin and ';' not in end: # Ausschluss von Add-Frag-Elementen todo später
 
                 if layer_name == 'TypeSystem_semant_Ann.xml':
                     Token = typesystem.get_type('gemtex.Concept')
                     #Token = typesystem.get_type('webanno.custom.FactCharact')
-                    cas.add(
-                        Token(
+
+                    new_token = Token(
                             begin=int(begin),
                             end=int(end),
                             #entities=entity_type
                             id=index,
                             literal=entity_type
                         )
-                    )
+                    entities[str(index)]['Token'] = new_token
+                    cas.add(new_token)
                 if layer_name == 'FactRelat_relations_layer.xml':
                     #Token = typesystem.get_type('gemtex.Concept')
                     Token = typesystem.get_type('webanno.custom.FactCharact')
@@ -55,6 +60,38 @@ def process_brat_file_pair(typesystem, text_file, layer_name, brat_project, outd
                             #literal=entity_type
                         )
                     )
+
+        if str(index).startswith('R'):  # R1	TRUE-ENHANCED Arg1:T12 Arg2:T11
+
+            def_relation = str(spl[0])
+            def_relation = def_relation.replace('CLIP', 'Clip')
+            def_relation = def_relation.replace('TRUE-ENHANCED', 'True-enhancend')
+            def_relation = def_relation.replace('NEGATED', 'Negated')
+            def_relation = def_relation.replace('UNCERTAIN', 'Uncertain')
+
+            Rel = typesystem.get_type('gemtex.Relation')
+
+            node_from = spl[1].replace('Arg1:', '')
+            node_to = spl[2].replace('Arg2:', '')
+
+            print(entities[node_from])
+            print(entities[node_to])
+
+            print(entities[str(node_from)]['Token'])
+            print(entities[str(node_to)]['Token'])
+
+            relation = Rel(
+                Dependent=entities[str(node_from)]['Token'],
+                Governor=entities[str(node_to)]['Token'],
+                kind=def_relation,
+            )
+            cas.add(relation)
+
+            #entities[node_from['relations']] = node_to
+            #entities['relations'][spl[1].replace('Arg1:', '')] = spl[2].replace('Arg2:', '')
+
+
+    #print(entities)
 
     out_file = text_file.replace('.txt', '.json').replace(brat_project, outdir)
     cas.to_json(out_file)
@@ -85,8 +122,15 @@ def process_project_by_layer(layer_name, brat_project):
         process_brat_file_pair(text_file=text_file, typesystem=typesystem, layer_name=layer_name, brat_project=brat_project, outdir=outdir)
 
 brat_project = 'data/full'
-#layer_name = 'TypeSystem_semant_Ann.xml'
+layer_name = 'TypeSystem_semant_Ann.xml'
 #process_project_by_layer(layer_name, brat_project)
 
-layer_name = 'FactRelat_relations_layer.xml'
-process_project_by_layer(layer_name, brat_project)
+#layer_name = 'FactRelat_relations_layer.xml'
+#process_project_by_layer(layer_name, brat_project)
+
+with open(layer_name, 'rb') as f:
+    typesystem = load_typesystem(f)
+
+outdir = 'out_dir'
+text_file = '/home/chlor/PycharmProjects/brat2inception/test_data/Albers.txt'
+process_brat_file_pair(typesystem, text_file, layer_name, brat_project, outdir)
