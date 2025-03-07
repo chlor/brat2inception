@@ -1,0 +1,33 @@
+# Christinas Notizen zu Codefragmenten und anderen Projeken
+
+
+https://github.com/Kadi-7/brat-to-inception/blob/main/brat_to_inception.ipynb
+
+
+def prepare_cas_for_semantic_annotation(cas, norm_dates):
+
+    file_typesystem = 'resources/double-layer/TypeSystem.xml'  # todo @chlor
+
+    with open(file_typesystem, 'rb') as f:
+        new_typesystem = load_typesystem(f)
+
+    cas_sem = Cas(
+        typesystem=new_typesystem,
+        sofa_string=cas.sofa_string,  # Text
+        document_language=cas.document_language
+    )
+
+    for sentence in cas.select('de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Sentence'):
+        for token in cas.select_covered('webanno.custom.PHI', sentence):
+            #if token.kind.startswith('DATE'):
+            if token.kind == 'DATE':
+                Token = new_typesystem.get_type('gemtex.Concept')
+                cas_sem.add(
+                    Token(
+                        begin=token.begin,
+                        end=token.end,
+                        id='http://snomed.info/id/258695005',
+                        literal=str(norm_dates[token.get_covered_text()])
+                    )
+                )
+    return cas_sem
