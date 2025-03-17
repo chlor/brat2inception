@@ -33,30 +33,35 @@ def process_brat_file_pair(typesystem, text_file, layer_name, brat_project, outd
 
             entities[str(index)] = {'entity_type': entity_type, 'begin': begin, 'end': end}
 
-            if ';' not in begin and ';' not in end: # Ausschluss von Add-Frag-Elementen todo später
+            #if ';' not in begin and ';' not in end: # Ausschluss von Add-Frag-Elementen todo später
 
-                if layer_name == 'TypeSystem_semant_Ann.xml':
-                    Token = typesystem.get_type('gemtex.Concept')
+            if not (';' not in begin and ';' not in end):
+                end = spl[len(spl) - 1]
 
-                    new_token = Token(
-                            begin=int(begin),
-                            end=int(end),
-                            id=index,
-                            literal=entity_type
-                        )
-                    entities[str(index)]['Token'] = new_token
-                    cas.add(new_token)
-                if layer_name == 'FactRelat_relations_layer.xml':
-                    Token = typesystem.get_type('webanno.custom.FactRelat')
-                    new_token = Token(
+            if layer_name == 'TypeSystem_semant_Ann.xml':
+                Token = typesystem.get_type('gemtex.Concept')
+
+                new_token = Token(
                         begin=int(begin),
                         end=int(end),
-                        entities=entity_type,
+                        id=index,
+                        literal=entity_type
                     )
+                entities[str(index)]['Token'] = new_token
+                cas.add(new_token)
+            if layer_name == 'FactRelat_relations_layer.xml':
+                Token = typesystem.get_type('webanno.custom.FactRelat')
+                new_token = Token(
+                    begin=int(begin),
+                    end=int(end),
+                    entities=entity_type,
+                )
 
-                    cas.add(new_token)
-                    entities[str(index)]['Token'] = new_token
-                    cas.add(new_token)
+                cas.add(new_token)
+                entities[str(index)]['Token'] = new_token
+                cas.add(new_token)
+
+
 
         if str(index).startswith('R'):  # R1	TRUE-ENHANCED Arg1:T12 Arg2:T11
 
@@ -69,26 +74,30 @@ def process_brat_file_pair(typesystem, text_file, layer_name, brat_project, outd
             node_from = spl[1].replace('Arg1:', '')
             node_to = spl[2].replace('Arg2:', '')
 
-            if layer_name == 'TypeSystem_semant_Ann.xml':
-                Rel = typesystem.get_type('gemtex.Relation')
-                relation = Rel(
-                    Dependent=entities[str(node_from)]['Token'],
-                    Governor=entities[str(node_to)]['Token'],
-                    kind=def_relation,
-                )
-                cas.add(relation)
+#            if layer_name == 'TypeSystem_semant_Ann.xml':
+#                Rel = typesystem.get_type('gemtex.Relation')
+#                relation = Rel(
+#                    Dependent=entities[str(node_from)]['Token'],
+#                    Governor=entities[str(node_to)]['Token'],
+#                    kind=def_relation,
+#                )
+#                cas.add(relation)
 
-            if layer_name == 'FactRelat_relations_layer.xml':
-                Rel = typesystem.get_type('webanno.custom.FactRelat')
+#            if layer_name == 'FactRelat_relations_layer.xml':
+#                Rel = typesystem.get_type('webanno.custom.FactRelat')
 
-                relation = Rel(
-                    Dependent=entities[str(node_from)]['Token'],
-                    Governor=entities[str(node_to)]['Token'],
-                    relations=def_relation,
-                )
-                cas.add(relation)
+#                relation = Rel(
+#                    Dependent=entities[str(node_from)]['Token'],
+#                    Governor=entities[str(node_to)]['Token'],
+#                    relations=def_relation,
+#                )
+#                cas.add(relation)
 
-    out_file = text_file.replace('.txt', '.json').replace(brat_project, outdir)
+    splits = text_file.replace(brat_project, outdir).split(os.sep)
+    print('-->', splits[0], splits[1], splits[2])
+
+    #out_file = text_file.replace('.txt', '.json').replace(brat_project, outdir)
+    out_file = splits[0] + os.sep + splits[2] + os.sep + splits[1] + '.json'
     cas.to_json(out_file)
     print(out_file)
 
@@ -106,15 +115,32 @@ def process_project_by_layer(layer_name, brat_project):
     if not os.path.isdir(outdir):
         os.mkdir(outdir)
 
-    for annotator in [i for i in os.listdir(brat_project) if i.endswith('.conf') == False]:
+    annotators = [i for i in os.listdir(brat_project) if not i.endswith('.conf')]
+    for annotator in annotators:
         if not os.path.isdir(outdir + os.sep + annotator):
             os.mkdir(outdir + os.sep + annotator)
 
     #files = [i for i in os.listdir(entry_folder) if i for j in os.listdir(entry_folder) if ".txt" in j in i]
     text_files = glob.glob(brat_project + os.sep + '**/*.txt', recursive=True)
 
+#    print([text_file.replace(brat_project + os.sep + annotators[0], '') for text_file in text_files])
+    #print([text_file.replace(brat_project + os.sep + annotators[0] + os.sep, '') for text_file in glob.glob(brat_project + os.sep + annotators[0] + os.sep + '**/*.txt', recursive=True)])
+    text_files_out = [text_file.replace(brat_project + os.sep + annotators[0] + os.sep, '') for text_file in glob.glob(brat_project + os.sep + annotators[0] + os.sep + '**/*.txt', recursive=True)]
+
+    for t_file in text_files_out:
+        if not os.path.isdir(outdir + os.sep + t_file):  # and i.endswith('.txt')
+            os.mkdir(outdir + os.sep + t_file)
+
     for text_file in text_files:
-        process_brat_file_pair(text_file=text_file, typesystem=typesystem, layer_name=layer_name, brat_project=brat_project, outdir=outdir)
+        print(text_file)
+
+        process_brat_file_pair(
+            text_file=text_file,
+            typesystem=typesystem,
+            layer_name=layer_name,
+            brat_project=brat_project,
+            outdir=outdir
+        )
 
 
 ### process test project and uncomment the part below
@@ -129,9 +155,9 @@ process_project_by_layer(layer_name, brat_project)
 
 ### process test file and uncomment the part below
 
-with open(layer_name, 'rb') as f:
-    typesystem = load_typesystem(f)
+#with open(layer_name, 'rb') as f:
+#    typesystem = load_typesystem(f)
 
-outdir = 'out_dir'
-text_file = '/home/chlor/PycharmProjects/brat2inception/test_data/Albers.txt'
-process_brat_file_pair(typesystem, text_file, layer_name, brat_project, outdir)
+#outdir = 'out_dir'
+#text_file = '/home/chlor/PycharmProjects/brat2inception/test_data/Albers.txt'
+#process_brat_file_pair(typesystem, text_file, layer_name, brat_project, outdir)
