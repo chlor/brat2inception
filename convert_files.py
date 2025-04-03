@@ -100,6 +100,9 @@ def process_brat_file_pair(typesystem, text_file, layer_name, brat_project, outd
     out_file = splits[0] + os.sep + splits[2] + os.sep + splits[1] + '.json'
     cas.to_json(out_file)
     print(out_file)
+    out_file_xml = splits[0] + os.sep + splits[2] + os.sep + splits[1] + '.xmi'
+    cas.to_xmi(out_file_xml)
+    print(out_file_xml)
 
 
 def process_project_by_layer(layer_name, brat_project):
