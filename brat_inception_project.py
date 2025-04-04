@@ -1,18 +1,18 @@
+import argparse
+import configparser
+import sys
+
 from pycaprio import Pycaprio
-from pycaprio.mappings import InceptionFormat, DocumentState
-from pycaprio.mappings import InceptionFormat, AnnotationState
+from pycaprio.mappings import InceptionFormat, AnnotationState, DocumentState
 import os
 import pandas as pd
 from cassis import *
 import glob
 
 
-def process_brat_file_pair(typesystem, text_file, layer_name):
+def process_brat_file_pair(typesystem, text_file, layer_name_entities, layer_name_relations):
 
     plain_text = open(text_file, "r", encoding="utf-8").read()
-
-    # 1) create a document if not exists
-    # 2) create a Cas if not exists
 
     cas = Cas(
         typesystem=typesystem,
@@ -35,39 +35,44 @@ def process_brat_file_pair(typesystem, text_file, layer_name):
             begin = spl[1]
             end = spl[2]
 
-            entities[str(index)] = {'entity_type': entity_type, 'begin': begin, 'end': end}
+            entities[str(index)] = {'entity_type': entity_type}
 
             if not (';' not in begin and ';' not in end):
                 end = spl[len(spl) - 1]
 
-            if layer_name == 'TypeSystem_semant_Ann.xml':
-                Token = typesystem.get_type('gemtex.Concept')
+            Token = typesystem.get_type(layer_name_entities)  # 'gemtex.Concept'
 
-                new_token = Token(
-                        begin=int(begin),
-                        end=int(end),
-                        id=index,
-                        literal=entity_type
-                    )
-                entities[str(index)]['Token'] = new_token
-                cas.add(new_token)
-            if layer_name == 'FactRelat_relations_layer.xml':
-                Token = typesystem.get_type('webanno.custom.FactRelat')
-                new_token = Token(
+            new_token = Token(
                     begin=int(begin),
                     end=int(end),
-                    entities=entity_type,
+                    id=index,
+                    literal=entity_type
                 )
 
-                cas.add(new_token)
-                entities[str(index)]['Token'] = new_token
-                cas.add(new_token)
+            entities[str(index)]['Token'] = new_token
+            cas.add(new_token)
 
+        if str(index).startswith('R'):  # R1	TRUE-ENHANCED Arg1:T12 Arg2:T11
 
-    #splits = text_file.replace(brat_project, outdir).split(os.sep)
+            def_relation = str(spl[0])
+            def_relation = def_relation.replace('CLIP', 'Clip')
+            def_relation = def_relation.replace('TRUE-ENHANCED', 'True-enhancend')
+            def_relation = def_relation.replace('NEGATED', 'Negated')
+            def_relation = def_relation.replace('UNCERTAIN', 'Uncertain')
 
-    #out_file = text_file.replace('.txt', '.json').replace(brat_project, outdir)
-    #out_file = splits[0] + os.sep + splits[2] + os.sep + splits[1] + '.json'
+            node_from = spl[1].replace('Arg1:', '')
+            node_to = spl[2].replace('Arg2:', '')
+
+            Rel = typesystem.get_type(layer_name_relations)
+            relation = Rel(
+                Dependent=entities[str(node_from)]['Token'],
+                Governor=entities[str(node_to)]['Token'],
+                kind=def_relation,
+                begin=entities[str(node_from)]['Token']['begin'],
+                end=entities[str(node_from)]['Token']['end']
+            )
+
+            cas.add(relation)
 
     xmi_file_cas = text_file.replace('.txt', '.xml')
     cas.to_xmi(xmi_file_cas)
@@ -85,86 +90,122 @@ def process_brat_file_pair(typesystem, text_file, layer_name):
 
     return xmi_file_cas
 
-brat_project = 'data/full'
-client = Pycaprio("http://127.0.0.1:8080", authentication=("admin", "admin"))
-new_project_name = 'semann-negfakt-3'
-projects = client.api.projects()
-if new_project_name not in [project.project_name for project in projects]:
-    new_project = client.api.create_project(new_project_name, creator_name="admin")
-else:
-    new_project_id = [project.project_id for project in projects if project.project_name == new_project_name][0]
-    new_project = client.api.project(new_project_id)
+
+if __name__ == '__main__':
 
 
-annotators = [i for i in os.listdir(brat_project) if not i.endswith('.conf')]
+    parser = argparse.ArgumentParser()
+    parser.add_argument('conf')
+    args = parser.parse_args()
 
-text_files = glob.glob(brat_project + os.sep + '**/*.txt', recursive=True)
-text_documents = [(text_file, text_file.replace(brat_project + os.sep + annotators[0] + os.sep, '')) for text_file in glob.glob(brat_project + os.sep + annotators[0] + os.sep + '**/*.txt', recursive=True)]
+    config = configparser.ConfigParser()
+    config.read(args.conf)
 
-#document_names = [d.document_name for d in client.api.documents(project=new_project_id)]
-documents = {d.document_name: d.document_id for d in client.api.documents(project=new_project_id)}
-
-for text_document_file, text_document_file_name in text_documents:
-    if text_document_file_name not in documents.keys():
-
-        #open(text_file, "r", encoding="utf-8").read()
-        with open(text_document_file, 'rb') as document_file:
-            new_document = client.api.create_document(
-                new_project_id,
-                text_document_file_name,
-                document_file,
-                document_format=InceptionFormat.TEXT#, document_state=DocumentState.ANNOTATION_COMPLETE
-            )
+    if str(args.conf).startswith('.\\'):
+        conf_file = str(args.conf).replace('.\\', '')
     else:
-        print(text_document_file_name, 'is inserted.')
+        conf_file = str(args.conf)
 
+    if not os.path.exists(conf_file):
+        print('Configuration file not found!')
+        sys.exit(1)
 
-print(annotators)
+    brat_project         = config['input']['brat_project']
+    client               = Pycaprio(config['input']['client_server'], authentication=(config['input']['client_user'], config['input']['client_pw']))
+    new_project_name     = config['input']['new_project_name']
+    file_name_typesystem = config['input']['file_name_typesystem']
+    layer_name_entities  = config['input']['layer_name_entities']
+    layer_name_relations = config['input']['layer_name_relations']
 
-annotated_documents = {ann: [(text_file, text_file.replace(brat_project + os.sep + annotators[i] + os.sep, '')) for text_file in glob.glob(brat_project + os.sep + annotators[i] + os.sep + '**/*.txt', recursive=True)] for i,ann in enumerate(annotators)}
+    # Create a project in INCEpTION
 
-print(annotated_documents)
+    projects = client.api.projects()
+    if new_project_name not in [project.project_name for project in projects]:
+        new_project = client.api.create_project(new_project_name, creator_name="admin")
+        new_project_id = [project.project_id for project in projects if project.project_name == new_project_name][0]
+    else:
+        new_project_id = [project.project_id for project in projects if project.project_name == new_project_name][0]
+        new_project = client.api.project(new_project_id)
 
-with open('TypeSystem_semant_Ann.xml', 'rb') as fr:
-    typesystem = load_typesystem(fr)
+    # Get the names of the annotators
 
-list_not_inserted = []
+    annotators = [i for i in os.listdir(brat_project) if not i.endswith('.conf')]
 
-for annotator in annotated_documents:
-    for text_document_file, text_document_file_name in annotated_documents[annotator]:
+    # Get the text documents by files and their names
 
-        ann_file = text_document_file.replace('.txt', '.ann')
+    text_files = glob.glob(brat_project + os.sep + '**/*.txt', recursive=True)
+    text_documents = [(text_file, text_file.replace(brat_project + os.sep + annotators[0] + os.sep, '')) for text_file in glob.glob(brat_project + os.sep + annotators[0] + os.sep + '**/*.txt', recursive=True)]
+    documents = {d.document_name: d.document_id for d in client.api.documents(project=new_project_id)}
 
-        file_with_cas = process_brat_file_pair(
-            text_file=text_document_file,
-            typesystem=typesystem,
-            layer_name='TypeSystem_semant_Ann.xml'
-        )
+    # Create the documents in your INCEpTION project
 
-        ann_intern = annotator.replace('dal', 'annotator_1').replace('fritzsch', 'annotator_2').replace('rudolphi', 'annotator_3')
+    for text_document_file, text_document_file_name in text_documents:
 
-        print(
-            'project', new_project_id,
-            'document', documents[text_document_file_name],
-            'user_name', ann_intern,
-            'content', text_document_file,
-            'annotation_format', "xmi",
-            'annotation_state', AnnotationState.IN_PROGRESS
-        )
-
-        try:
-            with open(file_with_cas, 'rb') as annotation_file:
-                new_annotation = client.api.create_annotation(
-                    project=new_project_id,
-                    document=documents[text_document_file_name],
-                    user_name=ann_intern,
-                    content=annotation_file,
-                    annotation_format="xmi",
-                    annotation_state=AnnotationState.IN_PROGRESS
+        if text_document_file_name not in documents.keys():
+            with open(text_document_file, 'rb') as document_file:
+                new_document = client.api.create_document(
+                    new_project_id,
+                    text_document_file_name,
+                    document_file,
+                    document_format=InceptionFormat.TEXT,
+                    document_state=DocumentState.ANNOTATION_COMPLETE
                 )
-        except:
-            print(text_document_file, 'is not inserted.')
-            list_not_inserted.append(text_document_file)
+        else:
+            print(text_document_file_name, 'is inserted already.')
 
-print('documents that are not inserted:')
-print(list_not_inserted)
+    annotated_documents = {
+        ann: [(text_file, text_file.replace(brat_project + os.sep + annotators[i] + os.sep, ''))
+                for text_file in glob.glob(brat_project + os.sep + annotators[i] + os.sep + '**/*.txt', recursive=True)] for i,ann in enumerate(annotators)
+    }
+
+    # Load the Typesystem
+
+    with open(file_name_typesystem, 'rb') as fr:
+        typesystem = load_typesystem(fr)
+
+    # Insert the annotations from brat in INCEpTION
+
+    list_not_inserted = []
+
+    for annotator in annotated_documents:
+
+        for text_document_file, text_document_file_name in annotated_documents[annotator]:
+
+            ann_file = text_document_file.replace('.txt', '.ann')
+
+            file_with_cas = process_brat_file_pair(
+                text_file=text_document_file,
+                typesystem=typesystem,
+                layer_name_entities=layer_name_entities,
+                layer_name_relations=layer_name_relations
+            )
+
+            # todo : Umbenennung außerhalb erledigen
+            ann_intern = annotator.replace('dal', 'annotator_1').replace('fritzsch', 'annotator_2').replace('rudolphi', 'annotator_3')
+
+            print(
+                'project', new_project_id,
+                'document', documents[text_document_file_name],
+                'user_name', ann_intern,
+                'content', text_document_file,
+                'annotation_format', "xmi",
+                #'annotation_state', AnnotationState.IN_PROGRESS
+                'annotation_state', AnnotationState.COMPLETE
+            )
+
+            try:
+                with open(file_with_cas, 'rb') as annotation_file:
+                    new_annotation = client.api.create_annotation(
+                        project=new_project_id,
+                        document=documents[text_document_file_name],
+                        user_name=ann_intern,
+                        content=annotation_file,
+                        annotation_format="xmi",
+                        annotation_state=AnnotationState.COMPLETE
+                    )
+            except:
+                print(text_document_file, 'is not inserted.')
+                list_not_inserted.append(text_document_file)
+
+    print('documents that are not inserted:')
+    print(list_not_inserted)
