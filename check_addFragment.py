@@ -1,5 +1,9 @@
+import argparse
+import configparser
 import glob
 import os
+import sys
+
 import pandas as pd
 from cassis import *
 
@@ -34,14 +38,11 @@ def process_brat_file_pair_addFragment(typesystem, text_file, brat_project, outd
 
             if ';' in begin or ';' in end:
                 print('Add Fragment in ', text_file)
-                #print(begin, end)
                 print(line)
                 print(line['entity_type_begin_end'].split(' '))
                 print(begin)
-                #print(spl[len(spl) - 1])
                 end = spl[len(spl) - 1]
-                #print( plain_text[ int(begin) : int( spl[ len(spl) - 1])] )
-                text= plain_text[ int(begin) : int( end)]
+                text = plain_text[int(begin):int(end)]
                 print('text')
                 print(text)
                 print('--------------------------------------')
@@ -80,6 +81,25 @@ def process_project(layer_name, brat_project):
             outdir=outdir
         )
 
-brat_project = 'data/full'
-layer_name = 'TypeSystem_semant_Ann.xml'
-process_project(layer_name, brat_project)
+
+if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('conf')
+    args = parser.parse_args()
+
+    config = configparser.ConfigParser()
+    config.read(args.conf)
+
+    if str(args.conf).startswith('.\\'):
+        conf_file = str(args.conf).replace('.\\', '')
+    else:
+        conf_file = str(args.conf)
+
+    if not os.path.exists(conf_file):
+        print('Configuration file not found!')
+        sys.exit(1)
+
+    brat_project = config['input']['brat_project']
+    file_name_typesystem = config['input']['file_name_typesystem']
+    process_project(file_name_typesystem, brat_project)

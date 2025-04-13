@@ -114,7 +114,13 @@ if __name__ == '__main__':
         sys.exit(1)
 
     brat_project         = config['input']['brat_project']
-    client               = Pycaprio(config['input']['client_server'], authentication=(config['input']['client_user'], config['input']['client_pw']))
+    client               = Pycaprio(
+                                config['input']['client_server'],
+                                authentication=(
+                                    config['input']['client_user'],
+                                    config['input']['client_pw']
+                                )
+                            )
     new_project_name     = config['input']['new_project_name']
     file_name_typesystem = config['input']['file_name_typesystem']
     layer_name_entities  = config['input']['layer_name_entities']
@@ -146,15 +152,16 @@ if __name__ == '__main__':
     else:
         annotation_status = AnnotationState.COMPLETE
 
-    # Create a project in INCEpTION
+    # Check if project exists
 
-    projects = client.api.projects()
-    if new_project_name not in [project.project_name for project in projects]:
-        new_project = client.api.create_project(new_project_name, creator_name="admin")
-        new_project_id = [project.project_id for project in projects if project.project_name == new_project_name][0]
+    if new_project_name not in [project.project_name for project in client.api.projects()]:
+        print("Project named '" + new_project_name + "' not found!")
+        print("Run 'create_inception_project_and_insert_documents.py config.conf'!")
+        exit(1)
     else:
-        new_project_id = [project.project_id for project in projects if project.project_name == new_project_name][0]
+        new_project_id = [project.project_id for project in client.api.projects() if project.project_name == new_project_name][0]
         new_project = client.api.project(new_project_id)
+        print('Project ' + new_project_name + ' is loaded.')
 
     # Get the names of the annotators
 
@@ -208,9 +215,6 @@ if __name__ == '__main__':
                 layer_name_entities=layer_name_entities,
                 layer_name_relations=layer_name_relations
             )
-
-            # todo : Umbenennung außerhalb erledigen
-            #ann_intern = annotator.replace('dal', 'annotator_1').replace('fritzsch', 'annotator_2').replace('rudolphi', 'annotator_3')
 
             try:
                 with open(file_with_cas, 'rb') as annotation_file:
