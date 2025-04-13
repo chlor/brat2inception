@@ -104,10 +104,7 @@
             </features>
                     
         </typeDescription>
-
-
-        <!--
-
+                
         <typeDescription>
                         
             <name>de.tudarmstadt.ukp.dkpro.core.api.coref.type.CoreferenceChain</name>
@@ -199,11 +196,7 @@
             </features>
                     
         </typeDescription>
-
-        -->
-
-        <!--
-
+                
         <typeDescription>
                         
             <name>de.tudarmstadt.ukp.dkpro.core.api.lexmorph.type.morph.MorphologicalFeatures</name>
@@ -407,8 +400,7 @@
             </features>
                     
         </typeDescription>
-        -->
-        <!--
+                
         <typeDescription>
                         
             <name>de.tudarmstadt.ukp.dkpro.core.api.lexmorph.type.pos.POS</name>
@@ -442,8 +434,7 @@
             </features>
                     
         </typeDescription>
-        -->
-        <!--
+                
         <typeDescription>
                         
             <name>de.tudarmstadt.ukp.dkpro.core.api.lexmorph.type.pos.POS_ADJ</name>
@@ -693,8 +684,7 @@
             <supertypeName>de.tudarmstadt.ukp.dkpro.core.api.lexmorph.type.pos.POS_X</supertypeName>
                     
         </typeDescription>
-        -->
-        <!--
+                
         <typeDescription>
                         
             <name>de.tudarmstadt.ukp.dkpro.core.api.metadata.type.DocumentMetaData</name>
@@ -768,8 +758,7 @@
             </features>
                     
         </typeDescription>
-        -->
-        <!--
+                
         <typeDescription>
                         
             <name>de.tudarmstadt.ukp.dkpro.core.api.metadata.type.MetaDataStringField</name>
@@ -933,11 +922,7 @@
             </features>
                     
         </typeDescription>
-        -->
-
-        <!-- NamedEntity ggf. umbenennen -->
-
-        <!--
+                
         <typeDescription>
                         
             <name>de.tudarmstadt.ukp.dkpro.core.api.ner.type.NamedEntity</name>
@@ -971,8 +956,7 @@
             </features>
                     
         </typeDescription>
-        -->
-        <!--
+                
         <typeDescription>
                         
             <name>de.tudarmstadt.ukp.dkpro.core.api.ner.type.Nationality</name>
@@ -1766,8 +1750,7 @@
             </features>
                     
         </typeDescription>
-        -->
-        <!--
+                
         <typeDescription>
                         
             <name>de.tudarmstadt.ukp.dkpro.core.api.syntax.type.chunk.Chunk</name>
@@ -1791,7 +1774,7 @@
             </features>
                     
         </typeDescription>
-
+                
         <typeDescription>
                         
             <name>de.tudarmstadt.ukp.dkpro.core.api.syntax.type.chunk.INTJ</name>
@@ -1861,8 +1844,7 @@
             <supertypeName>de.tudarmstadt.ukp.dkpro.core.api.syntax.type.chunk.Chunk</supertypeName>
                     
         </typeDescription>
-        -->
-        <!--
+                
         <typeDescription>
                         
             <name>de.tudarmstadt.ukp.dkpro.core.api.syntax.type.constituent.Constituent</name>
@@ -2168,8 +2150,7 @@
             <supertypeName>de.tudarmstadt.ukp.dkpro.core.api.syntax.type.constituent.Constituent</supertypeName>
                     
         </typeDescription>
-        -->
-        <!--
+                
         <typeDescription>
                         
             <name>de.tudarmstadt.ukp.dkpro.core.api.syntax.type.dependency.Dependency</name>
@@ -2573,8 +2554,7 @@
             <supertypeName>de.tudarmstadt.ukp.dkpro.core.api.syntax.type.dependency.Dependency</supertypeName>
                     
         </typeDescription>
-        -->
-        <!--
+                
         <typeDescription>
                         
             <name>de.tudarmstadt.ukp.dkpro.core.api.transform.type.SofaChangeAnnotation</name>
@@ -2618,7 +2598,7 @@
             </features>
                     
         </typeDescription>
-        -->
+                
         <typeDescription>
                         
             <name>Entity</name> <!-- <name>gemtex.Concept</name>-->
@@ -2652,8 +2632,7 @@
             </features>
                     
         </typeDescription>
-
-
+                
         <typeDescription>
                         
             <name>Relation</name> <!-- <name>gemtex.Relation</name>-->
@@ -2697,8 +2676,7 @@
             </features>
                     
         </typeDescription>
-
-        <!--
+                
         <typeDescription>
                         
             <name>org.dkpro.core.api.pdf.type.PdfChunk</name>
@@ -2782,8 +2760,7 @@
             </features>
                     
         </typeDescription>
-        -->
-        <!--
+                
         <typeDescription>
                         
             <name>org.dkpro.core.api.pdf.type.PdfPage</name>
@@ -3503,9 +3480,8 @@
                 </featureDescription>
                             
             </features>
-
+                    
         </typeDescription>
-        -->
             
     </types>
     

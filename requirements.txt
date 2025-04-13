@@ -1,0 +1,3 @@
+pandas~=2.2.3
+pycaprio~=0.3.0
+dkpro-cassis
