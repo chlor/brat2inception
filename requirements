@@ -1,5 +1,2 @@
 dkpro-cassis
 pandas
-pycaprionew_project = client.api.create_project("New project name", creator_name="other user")
-print(new_project) # <Project #3: New project name>
-

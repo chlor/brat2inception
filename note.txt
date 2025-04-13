@@ -1,4 +1,24 @@
-# Christinas Notizen zu Codefragmenten und anderen Projeken
+Hallo Richard,
+
+ich habe es mit pycaprio hinbekommen, ein BRAT-Projekt in INCEpTION zu portieren!
+
+Wir hatten hierzu auch GraSSCo mit in Bearbeitung.
+In 5 GraSSCo-Dokumenten sind Zeichen drin, die beim Import in INCEpTION gelöscht werden und die Offsets zum Originaltext nicht mehr passen.
+(Ich baue etwas, das die Zeichen für die betreffenden Dateien in GraSSCo erkennt und die Annotate schiebt.)
+Die Datei im Anhang fängt mit \xef\xbb\xbf an, das beim Import in INCEpTION gelöscht wird.
+Wenn ich dieses Dokument aus INCEpTION heraus wieder exportiere, ist das weg.
+Eine Meldung dazu erscheint in INCEpTION nicht.
+Ich behaupte, dass solche Zeichen auch in GeMTeX-Texten drin sein können.
+Damit ist auch kein Weg zurück, sobald ein Dokument in INCEpTION war, richtig?
+
+Ist es möglich, dass beim Import von Dateien eine Veränderung oder Zeichenkodierfehler angezeigt werden können?
+Im CAS-Doctor kann ich das doch nicht mehr reparieren, wenn es weg ist, oder passiert das Entfernen des Zeichens irgendwo anders?
+Gibt es irgendwo eine Doku dazu?
+
+Viele Grüße, Christina
+
+
+# Christinas Notizen zu Codefragmenten und anderen Projekten
 
 
 https://github.com/Kadi-7/brat-to-inception/blob/main/brat_to_inception.ipynb

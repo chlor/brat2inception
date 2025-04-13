@@ -14,9 +14,16 @@ def process_brat_file_pair(typesystem, text_file, layer_name_entities, layer_nam
 
     plain_text = open(text_file, "r", encoding="utf-8").read()
 
+    if plain_text[0].encode("utf-8") == b'\xef\xbb\xbf':
+        print("Warning:", text_file, "starts with 'Byte Order Mark'. It is removed.")
+        shift = True
+        plain_text = plain_text[1:]
+    else:
+        shift = False
+
     cas = Cas(
         typesystem=typesystem,
-        sofa_string=plain_text,  # Text
+        sofa_string=plain_text,
         document_language='de'
     )
     anno_file = text_file.replace('.txt', '.ann')
@@ -31,7 +38,7 @@ def process_brat_file_pair(typesystem, text_file, layer_name_entities, layer_nam
 
         if str(index).startswith('T'):
 
-            entity_type = spl[0]
+            entity_type = spl[0]#.split('\ţ')[1]
             begin = spl[1]
             end = spl[2]
 
@@ -42,12 +49,20 @@ def process_brat_file_pair(typesystem, text_file, layer_name_entities, layer_nam
 
             Token = typesystem.get_type(layer_name_entities)  # 'gemtex.Concept'
 
-            new_token = Token(
-                    begin=int(begin),
-                    end=int(end),
-                    id=index,
-                    literal=entity_type
-                )
+            if shift == False:
+                new_token = Token(
+                        begin=int(begin),
+                        end=int(end),
+                        id=entity_type,
+                        #literal=entity_type  # use it for attributions
+                    )
+            else:
+                new_token = Token(
+                        begin=int(begin) - 1,
+                        end=int(end) - 1,
+                        id=entity_type,
+                        #literal=entity_type  # use it for attributions
+                    )
 
             entities[str(index)]['Token'] = new_token
             cas.add(new_token)
@@ -76,23 +91,11 @@ def process_brat_file_pair(typesystem, text_file, layer_name_entities, layer_nam
 
     xmi_file_cas = text_file.replace('.txt', '.xml')
     cas.to_xmi(xmi_file_cas)
-    #print(out_file)
-    #out_file_xml = splits[0] + os.sep + splits[2] + os.sep + splits[1] + '.xmi'
-    #cas.to_xmi(out_file_xml)
-    #print(out_file_xml)
-
-    #print('Check Sofa ', text_file)
-    #print(cas.sofa_string[0], cas.sofa_string[1], cas.sofa_string[2], cas.sofa_string[3])
-    #print(cas.sofa_string[0])
-    #print(cas.sofa_string[0].encode("utf-8"))
-    #print(cas.sofa_string[0].decode("utf-8"))
-    #print('~~~~~~~~~~')
 
     return xmi_file_cas
 
 
 if __name__ == '__main__':
-
 
     parser = argparse.ArgumentParser()
     parser.add_argument('conf')
@@ -116,6 +119,7 @@ if __name__ == '__main__':
     file_name_typesystem = config['input']['file_name_typesystem']
     layer_name_entities  = config['input']['layer_name_entities']
     layer_name_relations = config['input']['layer_name_relations']
+    annotation_status    = config['input']['annotation_status']
 
     # Create a project in INCEpTION
 
@@ -139,6 +143,14 @@ if __name__ == '__main__':
 
     # Create the documents in your INCEpTION project
 
+    #if annotation_status == 'ANNOTATION_COMPLETE':
+    #    document_state = DocumentState.ANNOTATION_COMPLETE
+    if annotation_status == 'ANNOTATION_IN_PROGRESS':
+        document_state = DocumentState.ANNOTATION_IN_PROGRESS
+    else:
+        document_state = DocumentState.ANNOTATION_COMPLETE
+
+
     for text_document_file, text_document_file_name in text_documents:
 
         if text_document_file_name not in documents.keys():
@@ -148,7 +160,7 @@ if __name__ == '__main__':
                     text_document_file_name,
                     document_file,
                     document_format=InceptionFormat.TEXT,
-                    document_state=DocumentState.ANNOTATION_COMPLETE
+                    document_state=document_state
                 )
         else:
             print(text_document_file_name, 'is inserted already.')
@@ -207,5 +219,8 @@ if __name__ == '__main__':
                 print(text_document_file, 'is not inserted.')
                 list_not_inserted.append(text_document_file)
 
-    print('documents that are not inserted:')
-    print(list_not_inserted)
+    if not list_not_inserted:
+        print('All documents inserted!')
+    else:
+        print(len(list_not_inserted), 'documents that are not inserted:')
+        print(list_not_inserted)

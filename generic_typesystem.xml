@@ -2601,7 +2601,7 @@
                 
         <typeDescription>
                         
-            <name>gemtex.Concept</name>
+            <name>Entity</name>
                         
             <description/>
                         
@@ -2621,7 +2621,7 @@
                                 
                 <featureDescription>
                                         
-                    <name>literal</name>
+                    <name>attribute</name>
                                         
                     <description/>
                                         
@@ -2635,7 +2635,7 @@
                 
         <typeDescription>
                         
-            <name>gemtex.Relation</name>
+            <name>Relation</name>
                         
             <description/>
                         
@@ -2649,7 +2649,7 @@
                                         
                     <description/>
                                         
-                    <rangeTypeName>gemtex.Concept</rangeTypeName>
+                    <rangeTypeName>Entity</rangeTypeName>
                                     
                 </featureDescription>
                                 
@@ -2659,7 +2659,7 @@
                                         
                     <description/>
                                         
-                    <rangeTypeName>gemtex.Concept</rangeTypeName>
+                    <rangeTypeName>Entity</rangeTypeName>
                                     
                 </featureDescription>
                                 
