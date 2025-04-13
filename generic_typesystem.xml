@@ -2601,7 +2601,7 @@
                 
         <typeDescription>
                         
-            <name>Entity</name>
+            <name>Entity</name> <!-- <name>gemtex.Concept</name>-->
                         
             <description/>
                         
@@ -2618,10 +2618,10 @@
                     <rangeTypeName>uima.cas.String</rangeTypeName>
                                     
                 </featureDescription>
-                                
+
                 <featureDescription>
                                         
-                    <name>attribute</name>
+                    <name>attribute</name> <!--<name>literal</name>-->
                                         
                     <description/>
                                         
@@ -2635,7 +2635,7 @@
                 
         <typeDescription>
                         
-            <name>Relation</name>
+            <name>Relation</name> <!-- <name>gemtex.Relation</name>-->
                         
             <description/>
                         
@@ -2649,7 +2649,7 @@
                                         
                     <description/>
                                         
-                    <rangeTypeName>Entity</rangeTypeName>
+                    <rangeTypeName>Entity</rangeTypeName> <!--<rangeTypeName>gemtex.Concept</rangeTypeName>-->
                                     
                 </featureDescription>
                                 
@@ -2659,7 +2659,7 @@
                                         
                     <description/>
                                         
-                    <rangeTypeName>Entity</rangeTypeName>
+                    <rangeTypeName>Entity</rangeTypeName> <!--<rangeTypeName>gemtex.Concept</rangeTypeName>-->
                                     
                 </featureDescription>
                                 

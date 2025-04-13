@@ -39,7 +39,6 @@ for index, line in ann.iterrows():
         begin = spl[1]
         end = spl[2]
 
-        #Token = typesystem.get_type('gemtex.Concept')
         Token = typesystem_rel.get_type('webanno.custom.FactCharact')
         cas.add(
             Token(
@@ -49,7 +48,7 @@ for index, line in ann.iterrows():
             )
         )
 
-    if str(index).startswith('R'): #R1	TRUE-ENHANCED Arg1:T12 Arg2:T11
+    if str(index).startswith('R'):
         print(index)
         print(line)
         print('Dependent', spl[0])
@@ -77,16 +76,3 @@ for index, line in ann.iterrows():
 
 
 cas.to_json('test_data/new_cas.json')
-
-# clip\r\nTrue-enhancend\r\nNegated\r\nUncertain\r\nClip",
-
-#clip
-#True-enhancend
-#Negated
-#Uncertain
-#Clip",
-
-#TRUE-ENHANCED	Arg1:TRIGGER|STATEMENT|STATEMENT-NEGATED|ATTRIBUTE, Arg2:TRIGGER|STATEMENT|STATEMENT-NEGATED|ATTRIBUTE
-#UNCERTAIN		Arg1:TRIGGER|STATEMENT|STATEMENT-NEGATED|ATTRIBUTE, Arg2:TRIGGER|STATEMENT|STATEMENT-NEGATED|ATTRIBUTE
-#NEGATED			Arg1:TRIGGER|STATEMENT|STATEMENT-NEGATED|ATTRIBUTE, Arg2:TRIGGER|STATEMENT|STATEMENT-NEGATED|ATTRIBUTE
-#CLIP			Arg1:TRIGGER|STATEMENT|STATEMENT-NEGATED|ATTRIBUTE, Arg2:TRIGGER|STATEMENT|STATEMENT-NEGATED|ATTRIBUTE

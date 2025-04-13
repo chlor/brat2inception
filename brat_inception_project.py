@@ -49,19 +49,19 @@ def process_brat_file_pair(typesystem, text_file, layer_name_entities, layer_nam
 
             Token = typesystem.get_type(layer_name_entities)  # 'gemtex.Concept'
 
-            if shift == False:
+            if not shift:
                 new_token = Token(
                         begin=int(begin),
                         end=int(end),
                         id=entity_type,
-                        #literal=entity_type  # use it for attributions
+                        #literal=entity_type  # use it for attributions later, it's renamed to attribute
                     )
             else:
                 new_token = Token(
                         begin=int(begin) - 1,
                         end=int(end) - 1,
                         id=entity_type,
-                        #literal=entity_type  # use it for attributions
+                        #literal=entity_type  # use it for attributions later, it's renamed to attribute
                     )
 
             entities[str(index)]['Token'] = new_token
@@ -119,7 +119,32 @@ if __name__ == '__main__':
     file_name_typesystem = config['input']['file_name_typesystem']
     layer_name_entities  = config['input']['layer_name_entities']
     layer_name_relations = config['input']['layer_name_relations']
+
+    document_status      = config['input']['document_status']
+
+    if document_status == 'ANNOTATION_IN_PROGRESS':
+        document_status = DocumentState.ANNOTATION_IN_PROGRESS
+    elif document_status == 'ANNOTATION_COMPLETE':
+        document_status = DocumentState.ANNOTATION_COMPLETE
+    elif document_status == 'CURATION_IN_PROGRESS':
+        document_status = DocumentState.CURATION_IN_PROGRESS
+    elif document_status == 'CURATION_COMPLETE':
+        document_status = DocumentState.CURATION_COMPLETE
+    else:
+        document_status = DocumentState.ANNOTATION_COMPLETE
+
     annotation_status    = config['input']['annotation_status']
+
+    if annotation_status == 'NEW':
+        annotation_status = AnnotationState.NEW
+    elif annotation_status == 'LOCKED':
+        annotation_status = AnnotationState.LOCKED
+    elif annotation_status == 'IN_PROGRESS':
+        annotation_status = AnnotationState.IN_PROGRESS
+    elif annotation_status == 'COMPLETE':
+        annotation_status = AnnotationState.COMPLETE
+    else:
+        annotation_status = AnnotationState.COMPLETE
 
     # Create a project in INCEpTION
 
@@ -143,14 +168,6 @@ if __name__ == '__main__':
 
     # Create the documents in your INCEpTION project
 
-    #if annotation_status == 'ANNOTATION_COMPLETE':
-    #    document_state = DocumentState.ANNOTATION_COMPLETE
-    if annotation_status == 'ANNOTATION_IN_PROGRESS':
-        document_state = DocumentState.ANNOTATION_IN_PROGRESS
-    else:
-        document_state = DocumentState.ANNOTATION_COMPLETE
-
-
     for text_document_file, text_document_file_name in text_documents:
 
         if text_document_file_name not in documents.keys():
@@ -160,7 +177,7 @@ if __name__ == '__main__':
                     text_document_file_name,
                     document_file,
                     document_format=InceptionFormat.TEXT,
-                    document_state=document_state
+                    document_state=document_status
                 )
         else:
             print(text_document_file_name, 'is inserted already.')
@@ -193,27 +210,26 @@ if __name__ == '__main__':
             )
 
             # todo : Umbenennung außerhalb erledigen
-            ann_intern = annotator.replace('dal', 'annotator_1').replace('fritzsch', 'annotator_2').replace('rudolphi', 'annotator_3')
-
-            print(
-                'project', new_project_id,
-                'document', documents[text_document_file_name],
-                'user_name', ann_intern,
-                'content', text_document_file,
-                'annotation_format', "xmi",
-                #'annotation_state', AnnotationState.IN_PROGRESS
-                'annotation_state', AnnotationState.COMPLETE
-            )
+            #ann_intern = annotator.replace('dal', 'annotator_1').replace('fritzsch', 'annotator_2').replace('rudolphi', 'annotator_3')
 
             try:
                 with open(file_with_cas, 'rb') as annotation_file:
                     new_annotation = client.api.create_annotation(
                         project=new_project_id,
                         document=documents[text_document_file_name],
-                        user_name=ann_intern,
+                        user_name=annotator,
                         content=annotation_file,
                         annotation_format="xmi",
-                        annotation_state=AnnotationState.COMPLETE
+                        annotation_state=annotation_status
+                    )
+
+                    print(
+                        'project', new_project_id,
+                        'document', documents[text_document_file_name],
+                        'user_name', annotator,
+                        'content', text_document_file,
+                        'annotation_format', "xmi",
+                        'annotation_state', annotation_status, 'is insersted.'
                     )
             except:
                 print(text_document_file, 'is not inserted.')
