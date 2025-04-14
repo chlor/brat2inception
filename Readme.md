@@ -75,3 +75,8 @@
 
 # Note
 Add Fragments not supported. It's an open issue.
+
+# Statistics
+There is an output of annotation counts of the annotators and all annotations.
+It is stored in files `stats_of_annotations.csv` and `stats_of_annotations.xlsx`.
+

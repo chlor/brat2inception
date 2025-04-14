@@ -254,13 +254,16 @@ if __name__ == '__main__':
 
     # Filter über alle Annotatoren in 'level_1' und dann Summenbildung
 
-    for annotator in annotators:
-        print(annotator)
-        print(df_result.loc[df_result['level_1'] == annotator].sum())
-
     if not list_not_inserted:
         print('All documents inserted!')
     else:
         print(len(list_not_inserted), 'documents that are not inserted:')
 
         print(list_not_inserted)
+
+    for annotator in annotators:
+        print(annotator)
+        print(df_result.loc[df_result['level_1'] == annotator].sum())
+
+    print('all annotators:')
+    print(df_result.sum())
