@@ -1,12 +1,11 @@
 import argparse
 import configparser
 import sys
-
+from cassis import *
 from pycaprio import Pycaprio
 from pycaprio.mappings import InceptionFormat, AnnotationState, DocumentState
 import os
 import pandas as pd
-from cassis import *
 import glob
 
 
@@ -92,7 +91,7 @@ def process_brat_file_pair(typesystem, text_file, layer_name_entities, layer_nam
     xmi_file_cas = text_file.replace('.txt', '.xml')
     cas.to_xmi(xmi_file_cas)
 
-    return xmi_file_cas
+    return entities, xmi_file_cas
 
 
 if __name__ == '__main__':
@@ -203,18 +202,28 @@ if __name__ == '__main__':
 
     list_not_inserted = []
 
+    annotated_entities = {}
+
     for annotator in annotated_documents:
 
         for text_document_file, text_document_file_name in annotated_documents[annotator]:
 
             ann_file = text_document_file.replace('.txt', '.ann')
 
-            file_with_cas = process_brat_file_pair(
+            #annotated_entities[(annotator, text_document_file_name)], file_with_cas = process_brat_file_pair(
+            annotated_ents, file_with_cas = process_brat_file_pair(
                 text_file=text_document_file,
                 typesystem=typesystem,
                 layer_name_entities=layer_name_entities,
                 layer_name_relations=layer_name_relations
             )
+
+            df_ents = pd.DataFrame(annotated_ents).transpose()
+            #print(df_ents['entity_type'] == 'STATEMENT')
+            #print(df_ents['entity_type'] == 'TRIGGER')
+            #print(df_ents['entity_type'])
+            #print(df_ents['entity_type'].value_counts())
+            annotated_entities[text_document_file_name, annotator] = dict(df_ents['entity_type'].value_counts())
 
             try:
                 with open(file_with_cas, 'rb') as annotation_file:
@@ -239,8 +248,19 @@ if __name__ == '__main__':
                 print(text_document_file, 'is not inserted.')
                 list_not_inserted.append(text_document_file)
 
+    df_result = pd.DataFrame(annotated_entities).transpose().reset_index()
+    df_result.to_csv('stats_of_annotations.csv')
+    df_result.to_excel('stats_of_annotations.xlsx')
+
+    # Filter über alle Annotatoren in 'level_1' und dann Summenbildung
+
+    for annotator in annotators:
+        print(annotator)
+        print(df_result.loc[df_result['level_1'] == annotator].sum())
+
     if not list_not_inserted:
         print('All documents inserted!')
     else:
         print(len(list_not_inserted), 'documents that are not inserted:')
+
         print(list_not_inserted)
