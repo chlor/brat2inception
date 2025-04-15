@@ -43,28 +43,32 @@ def process_brat_file_pair(typesystem, text_file, layer_name_entities, layer_nam
 
             entities[str(index)] = {'entity_type': entity_type}
 
-            if not (';' not in begin and ';' not in end):
-                end = spl[len(spl) - 1]
+            if ';' in begin or ';' in end:
+                print('WARNING Add Fragment Annotation skipped: ', text_file, '-->', line)
 
-            Token = typesystem.get_type(layer_name_entities)  # 'gemtex.Concept'
+            #if not (';' not in begin and ';' not in end):
+            #    end = spl[len(spl) - 1]
 
-            if not shift:
-                new_token = Token(
-                        begin=int(begin),
-                        end=int(end),
-                        id=entity_type,
-                        #literal=entity_type  # use it for attributions later, it's renamed to attribute
-                    )
             else:
-                new_token = Token(
-                        begin=int(begin) - 1,
-                        end=int(end) - 1,
-                        id=entity_type,
-                        #literal=entity_type  # use it for attributions later, it's renamed to attribute
-                    )
+                Token = typesystem.get_type(layer_name_entities)  # 'gemtex.Concept'
 
-            entities[str(index)]['Token'] = new_token
-            cas.add(new_token)
+                if not shift:
+                    new_token = Token(
+                            begin=int(begin),
+                            end=int(end),
+                            label=entity_type,
+                            #literal=entity_type  # use it for attributions later, it's renamed to attribute
+                        )
+                else:
+                    new_token = Token(
+                            begin=int(begin) - 1,
+                            end=int(end) - 1,
+                            label=entity_type,
+                            #literal=entity_type  # use it for attributions later, it's renamed to attribute
+                        )
+
+                entities[str(index)]['Token'] = new_token
+                cas.add(new_token)
 
         if str(index).startswith('R'):  # R1	TRUE-ENHANCED Arg1:T12 Arg2:T11
 
@@ -78,15 +82,25 @@ def process_brat_file_pair(typesystem, text_file, layer_name_entities, layer_nam
             node_to = spl[2].replace('Arg2:', '')
 
             Rel = typesystem.get_type(layer_name_relations)
-            relation = Rel(
-                Dependent=entities[str(node_from)]['Token'],
-                Governor=entities[str(node_to)]['Token'],
-                kind=def_relation,
-                begin=entities[str(node_from)]['Token']['begin'],
-                end=entities[str(node_from)]['Token']['end']
-            )
 
-            cas.add(relation)
+            #if entities[str(node_from)]['Token'] and entities[str(node_to)]['Token']:
+            try:
+                relation = Rel(
+                    Dependent=entities[str(node_from)]['Token'],
+                    Governor=entities[str(node_to)]['Token'],
+                    label=def_relation,
+                    begin=entities[str(node_from)]['Token']['begin'],
+                    end=entities[str(node_from)]['Token']['end']
+                )
+                cas.add(relation)
+            #else:
+            except:
+                print('WARNING: Relation with following information is not set:')
+                print(' Dependent', entities[str(node_from)])
+                print(' Governor', entities[str(node_to)])
+                print(' label', def_relation)
+                #print(' begin', entities[str(node_from)]['Token']['begin'])
+                #print(' end', entities[str(node_from)]['Token']['end'])
 
     xmi_file_cas = text_file.replace('.txt', '.xml')
     cas.to_xmi(xmi_file_cas)
