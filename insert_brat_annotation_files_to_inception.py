@@ -46,9 +46,6 @@ def process_brat_file_pair(typesystem, text_file, layer_name_entities, layer_nam
             if ';' in begin or ';' in end:
                 print('WARNING Add Fragment Annotation skipped: ', text_file, '-->', line)
 
-            #if not (';' not in begin and ';' not in end):
-            #    end = spl[len(spl) - 1]
-
             else:
                 Token = typesystem.get_type(layer_name_entities)  # 'gemtex.Concept'
 
@@ -103,9 +100,12 @@ def process_brat_file_pair(typesystem, text_file, layer_name_entities, layer_nam
                 #print(' end', entities[str(node_from)]['Token']['end'])
 
     xmi_file_cas = text_file.replace('.txt', '.xml')
-    cas.to_xmi(xmi_file_cas)
 
-    return entities, xmi_file_cas
+    try:
+        cas.to_xmi(xmi_file_cas)
+        return entities, xmi_file_cas
+    except:
+        return -1
 
 
 if __name__ == '__main__':
@@ -215,6 +215,7 @@ if __name__ == '__main__':
     # Insert the annotations from brat in INCEpTION
 
     list_not_inserted = []
+    list_inserted = []
 
     annotated_entities = {}
 
@@ -224,40 +225,46 @@ if __name__ == '__main__':
 
             ann_file = text_document_file.replace('.txt', '.ann')
 
-            #annotated_entities[(annotator, text_document_file_name)], file_with_cas = process_brat_file_pair(
-            annotated_ents, file_with_cas = process_brat_file_pair(
-                text_file=text_document_file,
-                typesystem=typesystem,
-                layer_name_entities=layer_name_entities,
-                layer_name_relations=layer_name_relations
-            )
-
-            df_ents = pd.DataFrame(annotated_ents).transpose()
-            #print(df_ents['entity_type'] == 'STATEMENT')
-            #print(df_ents['entity_type'] == 'TRIGGER')
-            #print(df_ents['entity_type'])
-            #print(df_ents['entity_type'].value_counts())
-            annotated_entities[text_document_file_name, annotator] = dict(df_ents['entity_type'].value_counts())
-
             try:
-                with open(file_with_cas, 'rb') as annotation_file:
-                    new_annotation = client.api.create_annotation(
-                        project=new_project_id,
-                        document=documents[text_document_file_name],
-                        user_name=annotator,
-                        content=annotation_file,
-                        annotation_format="xmi",
-                        annotation_state=annotation_status
-                    )
 
-                    print(
-                        'project', new_project_id,
-                        'document', documents[text_document_file_name],
-                        'user_name', annotator,
-                        'content', text_document_file,
-                        'annotation_format', "xmi",
-                        'annotation_state', annotation_status, 'is insersted.'
-                    )
+                return_brat_ans = process_brat_file_pair(
+                    text_file=text_document_file,
+                    typesystem=typesystem,
+                    layer_name_entities=layer_name_entities,
+                    layer_name_relations=layer_name_relations
+                )
+
+                if return_brat_ans != -1:
+                    annotated_ents, file_with_cas = return_brat_ans
+
+                    df_ents = pd.DataFrame(annotated_ents).transpose()
+                    annotated_entities[text_document_file_name, annotator] = dict(df_ents['entity_type'].value_counts())
+
+                    with open(file_with_cas, 'rb') as annotation_file:
+                        new_annotation = client.api.create_annotation(
+                            project=new_project_id,
+                            document=documents[text_document_file_name],
+                            user_name=annotator,
+                            content=annotation_file,
+                            annotation_format="xmi",
+                            annotation_state=annotation_status
+                        )
+
+                        print(
+                            'project', new_project_id,
+                            'document', documents[text_document_file_name],
+                            'user_name', annotator,
+                            'content', text_document_file,
+                            'annotation_format', "xmi",
+                            'annotation_state', annotation_status, 'is insersted.'
+                        )
+
+                        list_inserted.append(text_document_file_name)
+
+                else:
+                    print('CAS was not created.')
+                    list_not_inserted.append(text_document_file)
+
             except:
                 print(text_document_file, 'is not inserted.')
                 list_not_inserted.append(text_document_file)
@@ -271,9 +278,11 @@ if __name__ == '__main__':
     if not list_not_inserted:
         print('All documents inserted!')
     else:
+        print(len(text_document_file_name), 'documents that are inserted.')
         print(len(list_not_inserted), 'documents that are not inserted:')
 
-        print(list_not_inserted)
+        for i, item in enumerate(list_not_inserted):
+            print(item.replace(brat_project, ""))
 
     for annotator in annotators:
         print(annotator)
