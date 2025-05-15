@@ -96,7 +96,7 @@ def process_brat_file_pair(typesystem, text_file, layer_name_entities, layer_nam
             #else:
             except:
                 print('WARNING: Relation with following information is not set:')
-                print(' Dependent', entities[str(node_to)]) # todo
+                print(' Dependent', entities[str(node_to)])
                 print(' Governor', entities[str(node_from)])
                 print(' label', def_relation)
                 #print(' begin', entities[str(node_from)]['Token']['begin'])
