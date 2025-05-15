@@ -29,6 +29,7 @@
     security.default-admin-remote-access=true
     ```
 * create user in INCEpTION with the names of the directory path definition
+* set an annotation user in INCEpTION with remote role and configure the user data in the following configuration file.
 
 
 ## Configuration
