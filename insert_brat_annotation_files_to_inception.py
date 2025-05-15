@@ -86,18 +86,18 @@ def process_brat_file_pair(typesystem, text_file, layer_name_entities, layer_nam
             #if entities[str(node_from)]['Token'] and entities[str(node_to)]['Token']:
             try:
                 relation = Rel(
-                    Dependent=entities[str(node_from)]['Token'],
-                    Governor=entities[str(node_to)]['Token'],
+                    Dependent=entities[str(node_to)]['Token'],
+                    Governor=entities[str(node_from)]['Token'],
                     label=def_relation,
-                    begin=entities[str(node_from)]['Token']['begin'],
-                    end=entities[str(node_from)]['Token']['end']
+                    begin=entities[str(node_to)]['Token']['begin'],
+                    end=entities[str(node_to)]['Token']['end']
                 )
                 cas.add(relation)
             #else:
             except:
                 print('WARNING: Relation with following information is not set:')
-                print(' Dependent', entities[str(node_from)])
-                print(' Governor', entities[str(node_to)])
+                print(' Dependent', entities[str(node_to)]) # todo
+                print(' Governor', entities[str(node_from)])
                 print(' label', def_relation)
                 #print(' begin', entities[str(node_from)]['Token']['begin'])
                 #print(' end', entities[str(node_from)]['Token']['end'])
