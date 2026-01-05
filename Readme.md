@@ -110,6 +110,13 @@ It is stored in files `stats_of_annotations.csv` and `stats_of_annotations.xlsx`
 `brat2inception` is provided as open source under the [MIT License](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository#searching-github-by-license-type).
 
 
+# Citation
+
+If you use brat2inceotion in academia, please cite:
+`
+Christina Lohr. (2026). chlor/brat2inception: First release. (v1.0.0). Zenodo. https://doi.org/10.5281/zenodo.18155663
+`
+
 # Contact
 [Christina Lohr](https://github.com/chlor)
 [Email](mailto:christina-lohr@web.de)
