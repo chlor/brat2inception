@@ -1,5 +1,9 @@
 # brat2inception
 
+This is `brat2inception` - a guide on how to convert [Brat](https://brat.nlplab.org/examples.html) annotation projects into [INCEpTION](https://inception-project.github.io/) annotation projects.
+This collection of Python based scripts is developed in March 2025 with INCEpTION 35.2.
+Newer versions are not tested.
+
 ## Installation
 
 * Install packages from [requirements.txt](requirements.txt):
@@ -81,3 +85,14 @@ Add Fragments not supported. It's an open issue.
 There is an output of annotation counts of the annotators and all annotations.
 It is stored in files `stats_of_annotations.csv` and `stats_of_annotations.xlsx`.
 
+# License
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/dopameter/dopameter/blob/main/LICENSE)
+
+`brat2inception` is provided as open source under the [MIT License](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository#searching-github-by-license-type).
+
+
+# Contact
+[Christina Lohr](https://github.com/chlor)
+[Email](christina-lohr@web.de)
+[Web](https://chlor.github.io/)
