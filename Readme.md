@@ -112,5 +112,5 @@ It is stored in files `stats_of_annotations.csv` and `stats_of_annotations.xlsx`
 
 # Contact
 [Christina Lohr](https://github.com/chlor)
-[Email](christina-lohr@web.de)
+[Email](mailto:christina-lohr@web.de)
 [Web](https://chlor.github.io/)
