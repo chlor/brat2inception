@@ -4,6 +4,24 @@ This is `brat2inception` - a guide on how to convert [Brat](https://brat.nlplab.
 This collection of Python based scripts is developed in March 2025 with INCEpTION 35.2.
 Newer versions are not tested.
 
+----
+![Version](https://img.shields.io/badge/version-v1.0.0-rc0)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/chlor/brat2inception/blob/main/LICENSE)
+![GitHub contributors](https://img.shields.io/github/contributors/chlor/brat2inception)
+![GitHub commit activity (branch)](https://img.shields.io/github/commit-activity/t/chlor/brat2inception)
+![GitHub closed issues](https://img.shields.io/github/issues-closed/chlor/brat2inception)
+![GitHub issues](https://img.shields.io/github/issues/chlor/brat2inception)
+![GitHub closed pull requests](https://img.shields.io/github/issues-pr-closed/chlor/brat2inception)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/chlor/brat2inception)
+![GitHub last commit](https://img.shields.io/github/last-commit/chlor/brat2inception)
+![GitHub watchers](https://img.shields.io/github/watchers/chlor/brat2inception)
+![GitHub forks](https://img.shields.io/github/forks/chlor/brat2inception)
+![GitHub Repo stars](https://img.shields.io/github/stars/chlor/brat2inception)
+![Visitors](https://api.visitorbadge.io/api/combined?path=https%3A%2F%2Fgithub.comchlor/brat2inception&label=Visitors&countColor=%23263759&style=flat)
+[![Contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/chlor/brat2inception/blob/main/README.md)
+![GitHub repo size](https://img.shields.io/github/repo-size/chlor/brat2inception)
+----
+
 ## Installation
 
 * Install packages from [requirements.txt](requirements.txt):
@@ -87,7 +105,7 @@ It is stored in files `stats_of_annotations.csv` and `stats_of_annotations.xlsx`
 
 # License
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/dopameter/dopameter/blob/main/LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/chlor/brat2inception/blob/main/LICENSE)
 
 `brat2inception` is provided as open source under the [MIT License](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository#searching-github-by-license-type).
 
